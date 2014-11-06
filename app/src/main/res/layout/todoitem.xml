@@ -10,7 +10,8 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="Large Text"
-        android:padding="10dp"
+        android:textColor="#a4000000"
+        android:padding="5dp"
         android:id="@+id/listItemText"
         android:layout_gravity="center_horizontal"
         android:layout_weight="0.16" />

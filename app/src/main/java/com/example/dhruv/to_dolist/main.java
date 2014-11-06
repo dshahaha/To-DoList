@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -19,14 +20,16 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Dictionary;
 import java.util.List;
+import java.util.Map;
 
 
 public class main extends Activity {
 
     ArrayList<String> tasks = new ArrayList<String>();
     ListView listView;
-    ToDoAdapter adapter = null;
+    ToDoAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +41,33 @@ public class main extends Activity {
         listView.setAdapter(adapter);
         findViewById(R.id.button).setOnClickListener(new OnPressListener());
         listView.setOnItemLongClickListener(new OnItemClickListener());
+        SharedPreferences preferences = getPreferences(MODE_PRIVATE);
+        for(int i = 0; i<preferences.getAll().size();i++){
+            if(preferences.getString(i+"",null) != null)
+                tasks.add(preferences.getString(i+"",null));
+        }
+        adapter.notifyDataSetChanged();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        SharedPreferences.Editor editor = getPreferences(MODE_PRIVATE).edit();
+        for(int i = 0;i<tasks.size();i++)
+            editor.putString("" + i, tasks.get(i));
+        editor.apply();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        SharedPreferences.Editor editor = getPreferences(MODE_PRIVATE).edit();
+        if(tasks.size()== 0)
+            editor.clear();
+        else
+            for(int i = 0;i<tasks.size();i++)
+                editor.putString("" + i, tasks.get(i));
+        editor.apply();
     }
 
 
@@ -59,6 +89,8 @@ public class main extends Activity {
         }
         return super.onOptionsItemSelected(item);
     }
+
+
 
 
     public class ToDoAdapter extends ArrayAdapter<String> {
@@ -90,18 +122,18 @@ public class main extends Activity {
     public class OnItemClickListener implements AdapterView.OnItemLongClickListener{
         @Override
         public boolean onItemLongClick(AdapterView<?> adapterView, View view, final int position, long l){
-            AlertDialog.Builder adb=new AlertDialog.Builder(main.this);
-            adb.setTitle("Delete?");
-            adb.setMessage("Are you sure you want to delete this task?");
-            adb.setNegativeButton("No", null);
-            adb.setPositiveButton("Yes", new AlertDialog.OnClickListener() {
+            AlertDialog.Builder deleteBox =new AlertDialog.Builder(main.this);
+            deleteBox.setTitle(tasks.get(position).toString());
+            deleteBox.setMessage("Delete this task?");
+            deleteBox.setNegativeButton("No", null);
+            deleteBox.setPositiveButton("Yes", new AlertDialog.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
                     tasks.remove(position);
                     adapter.notifyDataSetChanged();
-                    Toast.makeText(getApplicationContext(),"Deleted", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Deleted", Toast.LENGTH_SHORT).show();
                 }
             });
-            adb.show();
+            deleteBox.show();
             return true;
         }
         public void onNothingSelected(AdapterView<?> view){}
@@ -112,22 +144,22 @@ public class main extends Activity {
         public ToDoDialog(Context context) {
             super(context);
             final EditText toDoEditText = new EditText(main.this);
-            AlertDialog.Builder alert = new AlertDialog.Builder(main.this);
-            alert.setTitle("New Task");
+            AlertDialog.Builder newTaskBox = new AlertDialog.Builder(main.this);
+            newTaskBox.setTitle("New Task");
             toDoEditText.setHint("\nEnter Task");
             toDoEditText.setMinimumHeight(200);
-            alert.setView(toDoEditText);
+            newTaskBox.setView(toDoEditText);
 
-            alert.setPositiveButton("Create", new DialogInterface.OnClickListener() {
+            newTaskBox.setPositiveButton("Create", new DialogInterface.OnClickListener() {
 
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
-                    if(toDoEditText.getText().toString().length() != 0)
+                    if (toDoEditText.getText().toString().length() != 0)
                         tasks.add(toDoEditText.getText().toString());
                     adapter.notifyDataSetChanged();
                 }
             });
-            alert.show();
+            newTaskBox.show();
         }
     }
 
