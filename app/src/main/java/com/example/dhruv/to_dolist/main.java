@@ -2,7 +2,6 @@ package com.example.dhruv.to_dolist;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
@@ -12,17 +11,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.AdapterViewFlipper;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import java.util.ArrayList;
-import java.util.Dictionary;
 import java.util.List;
-import java.util.Map;
 
 
 public class main extends Activity {
@@ -53,6 +48,7 @@ public class main extends Activity {
     protected void onPause() {
         super.onPause();
         SharedPreferences.Editor editor = getPreferences(MODE_PRIVATE).edit();
+        editor.clear();
         for(int i = 0;i<tasks.size();i++)
             editor.putString("" + i, tasks.get(i));
         editor.apply();
@@ -62,11 +58,9 @@ public class main extends Activity {
     protected void onDestroy() {
         super.onDestroy();
         SharedPreferences.Editor editor = getPreferences(MODE_PRIVATE).edit();
-        if(tasks.size()== 0)
-            editor.clear();
-        else
-            for(int i = 0;i<tasks.size();i++)
-                editor.putString("" + i, tasks.get(i));
+        editor.clear();
+        for(int i = 0;i<tasks.size();i++)
+            editor.putString("" + i, tasks.get(i));
         editor.apply();
     }
 
@@ -84,10 +78,7 @@ public class main extends Activity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
+        return (id == R.id.action_settings||super.onOptionsItemSelected(item));
     }
 
 
@@ -123,7 +114,7 @@ public class main extends Activity {
         @Override
         public boolean onItemLongClick(AdapterView<?> adapterView, View view, final int position, long l){
             AlertDialog.Builder deleteBox =new AlertDialog.Builder(main.this);
-            deleteBox.setTitle(tasks.get(position).toString());
+            deleteBox.setTitle(tasks.get(position));
             deleteBox.setMessage("Delete this task?");
             deleteBox.setNegativeButton("No", null);
             deleteBox.setPositiveButton("Yes", new AlertDialog.OnClickListener() {
@@ -136,7 +127,6 @@ public class main extends Activity {
             deleteBox.show();
             return true;
         }
-        public void onNothingSelected(AdapterView<?> view){}
     }
 
 
