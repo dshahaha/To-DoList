@@ -1,5 +1,6 @@
 package com.example.dhruv.to_dolist;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -30,7 +31,8 @@ public class main extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        ActionBar actionBar = getActionBar();
+        actionBar.hide();
         listView = (ListView) findViewById(R.id.listView);
         adapter = new ToDoAdapter(this, tasks);
         listView.setAdapter(adapter);
@@ -152,5 +154,4 @@ public class main extends Activity {
             newTaskBox.show();
         }
     }
-
 }
